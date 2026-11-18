@@ -1,0 +1,19 @@
+import { useState } from "react";
+
+function App() {
+  const [contador, setContador] = useState(0);
+
+  return (
+    <div>
+      <h1>Teste do React</h1>
+
+      <p>Valor do contador: {contador}</p>
+
+      <button onClick={() => setContador(contador + 1)}>
+        Incrementar
+      </button>
+    </div>
+  );
+}
+
+export default App;
