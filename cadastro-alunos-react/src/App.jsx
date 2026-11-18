@@ -1,18 +1,22 @@
-import { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Home from "./pages/Home";
+import Alunos from "./pages/Alunos";
+import Professores from "./pages/Professores";
+import Funcionarios from "./pages/Funcionarios";
+
+import "./App.css";
 
 function App() {
-  const [contador, setContador] = useState(0);
-
   return (
-    <div>
-      <h1>Teste do React</h1>
-
-      <p>Valor do contador: {contador}</p>
-
-      <button onClick={() => setContador(contador + 1)}>
-        Incrementar
-      </button>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/alunos" element={<Alunos />} />
+        <Route path="/professores" element={<Professores />} />
+        <Route path="/funcionarios" element={<Funcionarios />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

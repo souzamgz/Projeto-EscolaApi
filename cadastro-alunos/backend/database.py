@@ -1,8 +1,10 @@
+from pathlib import Path
+
 import mysql.connector
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 
 def criar_conexao():
