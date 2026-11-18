@@ -9,3 +9,25 @@ export async function listarAlunos() {
 
   return resposta.json();
 }
+
+export async function cadastrarAluno(aluno) {
+  const resposta = await fetch(`${API_URL}/alunos`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(aluno),
+  });
+
+  const dados = await resposta.json();
+
+  if (!resposta.ok) {
+    throw new Error(
+      typeof dados.detail === "string"
+        ? dados.detail
+        : "Não foi possível cadastrar o aluno. Confira os dados informados."
+    );
+  }
+
+  return dados;
+}

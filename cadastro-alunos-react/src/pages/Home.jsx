@@ -4,21 +4,27 @@ function Home() {
   const modulos = [
     {
       titulo: "Alunos",
-      descricao: "Consulte os alunos cadastrados.",
+      descricao: "Consulte os alunos cadastrados ou realize um novo cadastro.",
       rota: "/alunos",
+      rotaCadastro: "/alunos?acao=cadastrar",
       icone: "🎓",
+      textoCadastro: "Cadastrar aluno",
     },
     {
       titulo: "Professores",
-      descricao: "Consulte os professores cadastrados.",
+      descricao: "Consulte os professores cadastrados ou realize um novo cadastro.",
       rota: "/professores",
+      rotaCadastro: "/professores?acao=cadastrar",
       icone: "👨‍🏫",
+      textoCadastro: "Cadastrar professor",
     },
     {
       titulo: "Funcionários",
-      descricao: "Consulte os funcionários cadastrados.",
+      descricao: "Consulte os funcionários cadastrados ou realize um novo cadastro.",
       rota: "/funcionarios",
+      rotaCadastro: "/funcionarios?acao=cadastrar",
       icone: "👔",
+      textoCadastro: "Cadastrar funcionário",
     },
   ];
 
@@ -35,9 +41,16 @@ function Home() {
             <div className="icone">{modulo.icone}</div>
             <h2>{modulo.titulo}</h2>
             <p>{modulo.descricao}</p>
-            <Link className="botao botao-principal" to={modulo.rota}>
-              Ver {modulo.titulo.toLowerCase()}
-            </Link>
+
+            <div className="botoes-card">
+              <Link className="botao botao-principal" to={modulo.rota}>
+                Ver {modulo.titulo.toLowerCase()}
+              </Link>
+
+              <Link className="botao botao-secundario" to={modulo.rotaCadastro}>
+                {modulo.textoCadastro}
+              </Link>
+            </div>
           </article>
         ))}
       </section>
