@@ -1,12 +1,14 @@
-import { Link } from "react-router-dom";
+import PessoaPage from "./PessoaPage";
 
 function Funcionarios() {
   return (
-    <main className="pagina">
-      <Link to="/">← Voltar ao início</Link>
-      <h1>Funcionários</h1>
-      <p>Atividade: implementar a listagem de funcionários.</p>
-    </main>
+    <PessoaPage
+      recurso="funcionarios"
+      titulo="Funcionários"
+      singular="funcionário"
+      rotulo="Funcionário"
+      idField="codFunc"
+    />
   );
 }
 
