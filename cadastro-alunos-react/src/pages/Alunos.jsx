@@ -20,6 +20,8 @@ function Alunos() {
   const [erro, setErro] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
+  const [campoFiltro, setCampoFiltro] = useState("nome");
+  const [textoFiltro, setTextoFiltro] = useState("");
 
   const mostrarFormulario = searchParams.get("acao") === "cadastrar";
 
@@ -79,6 +81,18 @@ function Alunos() {
       setSalvando(false);
     }
   }
+
+  const alunosFiltrados = alunos.filter((aluno) => {
+    const valor = aluno[campoFiltro];
+
+    if (valor === null || valor === undefined) {
+      return false;
+    }
+
+    return String(valor)
+      .toLowerCase()
+      .includes(textoFiltro.trim().toLowerCase());
+  });
 
   return (
     <main className="pagina">
@@ -211,6 +225,54 @@ function Alunos() {
         </section>
       )}
 
+      <section className="filtros">
+        <label>
+          Filtrar por
+          <select
+            value={campoFiltro}
+            onChange={(evento) => setCampoFiltro(evento.target.value)}
+          >
+            <option value="codAluno">Código</option>
+            <option value="nome">Nome</option>
+            <option value="cpf">CPF</option>
+            <option value="email">E-mail</option>
+            <option value="data_nascimento">Data de nascimento</option>
+            <option value="telefone">Telefone</option>
+            <option value="ra">RA</option>
+            <option value="cidade">Cidade</option>
+          </select>
+        </label>
+
+        <label>
+          Texto para buscar
+          <input
+            type="text"
+            value={textoFiltro}
+            onChange={(evento) => setTextoFiltro(evento.target.value)}
+            placeholder="Digite o que deseja encontrar"
+          />
+        </label>
+
+        <button
+          type="button"
+          className="botao botao-principal"
+          onClick={() => setTextoFiltro((texto) => texto.trim())}
+        >
+          Filtrar
+        </button>
+
+        <button
+          type="button"
+          className="botao botao-secundario"
+          onClick={() => {
+            setCampoFiltro("nome");
+            setTextoFiltro("");
+          }}
+        >
+          Limpar
+        </button>
+      </section>
+
       <h2>Alunos cadastrados</h2>
 
       {carregando ? (
@@ -232,7 +294,7 @@ function Alunos() {
             </thead>
 
             <tbody>
-              {alunos.map((aluno) => (
+              {alunosFiltrados.map((aluno) => (
                 <tr key={aluno.codAluno}>
                   <td>{aluno.codAluno}</td>
                   <td>{aluno.nome}</td>
@@ -245,9 +307,13 @@ function Alunos() {
                 </tr>
               ))}
 
-              {alunos.length === 0 && (
+              {alunosFiltrados.length === 0 && (
                 <tr>
-                  <td colSpan="8">Nenhum aluno cadastrado.</td>
+                  <td colSpan="8">
+                    {alunos.length === 0
+                      ? "Nenhum aluno cadastrado."
+                      : "Nenhum aluno encontrado para esse filtro."}
+                  </td>
                 </tr>
               )}
             </tbody>
