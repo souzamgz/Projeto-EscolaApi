@@ -98,6 +98,8 @@ function obterMensagemErro(resultado) {
     return resultado.detail;
 }
 
+let funcionarios = [];
+
 async function carregarFuncionarios() {
 
     const tabela = document.getElementById("listaFuncionarios");
@@ -114,27 +116,9 @@ async function carregarFuncionarios() {
             throw new Error("Erro ao buscar funcionarios.");
         }
 
-        const funcionarios = await resposta.json();
+        funcionarios = await resposta.json();
 
-        tabela.innerHTML = "";
-
-        funcionarios.forEach(funcionario => {
-
-            const linha = document.createElement("tr");
-
-            linha.innerHTML = `
-                <td>${funcionario.codFunc}</td>
-                <td>${funcionario.nome}</td>
-                <td>${funcionario.cpf}</td>
-                <td>${funcionario.email}</td>
-                <td>${funcionario.data_nascimento}</td>
-                <td>${funcionario.telefone}</td>
-                <td>${funcionario.cidade}</td>
-            `;
-
-            tabela.appendChild(linha);
-
-        });
+        exibirFuncionarios(funcionarios);
 
     } catch (erro) {
 
@@ -151,5 +135,115 @@ async function carregarFuncionarios() {
 }
 
 
-// Executa a listagem
+// ======================================================
+// EXIBIR FUNCIONARIOS NA TABELA
+// ======================================================
+
+function exibirFuncionarios(listaFuncionarios) {
+
+    const tabela = document.getElementById("listaFuncionarios");
+
+    if (!tabela) {
+        return;
+    }
+
+    tabela.innerHTML = "";
+
+    listaFuncionarios.forEach(funcionario => {
+
+        const linha = document.createElement("tr");
+
+        linha.innerHTML = `
+            <td>${funcionario.codFunc}</td>
+            <td>${funcionario.nome}</td>
+            <td>${funcionario.cpf}</td>
+            <td>${funcionario.email}</td>
+            <td>${funcionario.data_nascimento}</td>
+            <td>${funcionario.telefone}</td>
+            <td>${funcionario.cidade}</td>
+        `;
+
+        tabela.appendChild(linha);
+
+    });
+}
+
+
+// ======================================================
+// FILTRO DE FUNCIONARIOS
+// ======================================================
+
+function filtrarFuncionarios() {
+
+    const campoElemento = document.getElementById("campoFiltro");
+    const textoElemento = document.getElementById("textoFiltro");
+
+    if (!campoElemento || !textoElemento) {
+        return;
+    }
+
+    const campo = campoElemento.value;
+
+    const texto = textoElemento.value
+        .toLowerCase()
+        .trim();
+
+    const funcionariosFiltrados = funcionarios.filter(funcionario => {
+
+        const valor = funcionario[campo];
+
+        if (valor === null || valor === undefined) {
+            return false;
+        }
+
+        return String(valor)
+            .toLowerCase()
+            .includes(texto);
+    });
+
+    exibirFuncionarios(funcionariosFiltrados);
+}
+
+
+// ======================================================
+// EVENTOS DO FILTRO
+// ======================================================
+
+const textoFiltro = document.getElementById("textoFiltro");
+
+if (textoFiltro) {
+
+    textoFiltro.addEventListener("input", filtrarFuncionarios);
+
+}
+
+
+const campoFiltro = document.getElementById("campoFiltro");
+
+if (campoFiltro) {
+
+    campoFiltro.addEventListener("change", filtrarFuncionarios);
+
+}
+
+
+const btnLimparFiltro = document.getElementById("btnLimparFiltro");
+
+if (btnLimparFiltro) {
+
+    btnLimparFiltro.addEventListener("click", function() {
+
+        document.getElementById("textoFiltro").value = "";
+
+        exibirFuncionarios(funcionarios);
+
+    });
+
+}
+
+
+// ======================================================
+// EXECUTA A LISTAGEM
+// ======================================================
+
 carregarFuncionarios();

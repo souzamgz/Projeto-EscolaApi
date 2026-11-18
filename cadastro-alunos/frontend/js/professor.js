@@ -98,6 +98,8 @@ function obterMensagemErro(resultado) {
     return resultado.detail;
 }
 
+let professores = [];
+
 async function carregarProfessores() {
 
     const tabela = document.getElementById("listaProfessores");
@@ -114,27 +116,9 @@ async function carregarProfessores() {
             throw new Error("Erro ao buscar professores.");
         }
 
-        const professores = await resposta.json();
+        professores = await resposta.json();
 
-        tabela.innerHTML = "";
-
-        professores.forEach(professor => {
-
-            const linha = document.createElement("tr");
-
-            linha.innerHTML = `
-                <td>${professor.codProf}</td>
-                <td>${professor.nome}</td>
-                <td>${professor.cpf}</td>
-                <td>${professor.email}</td>
-                <td>${professor.data_nascimento}</td>
-                <td>${professor.telefone}</td>
-                <td>${professor.cidade}</td>
-            `;
-
-            tabela.appendChild(linha);
-
-        });
+        exibirProfessores(professores);
 
     } catch (erro) {
 
@@ -151,5 +135,115 @@ async function carregarProfessores() {
 }
 
 
-// Executa a listagem
+// ======================================================
+// EXIBIR PROFESSORES NA TABELA
+// ======================================================
+
+function exibirProfessores(listaProfessores) {
+
+    const tabela = document.getElementById("listaProfessores");
+
+    if (!tabela) {
+        return;
+    }
+
+    tabela.innerHTML = "";
+
+    listaProfessores.forEach(professor => {
+
+        const linha = document.createElement("tr");
+
+        linha.innerHTML = `
+            <td>${professor.codProf}</td>
+            <td>${professor.nome}</td>
+            <td>${professor.cpf}</td>
+            <td>${professor.email}</td>
+            <td>${professor.data_nascimento}</td>
+            <td>${professor.telefone}</td>
+            <td>${professor.cidade}</td>
+        `;
+
+        tabela.appendChild(linha);
+
+    });
+}
+
+
+// ======================================================
+// FILTRO DE PROFESSORES
+// ======================================================
+
+function filtrarProfessores() {
+
+    const campoElemento = document.getElementById("campoFiltro");
+    const textoElemento = document.getElementById("textoFiltro");
+
+    if (!campoElemento || !textoElemento) {
+        return;
+    }
+
+    const campo = campoElemento.value;
+
+    const texto = textoElemento.value
+        .toLowerCase()
+        .trim();
+
+    const professoresFiltrados = professores.filter(professor => {
+
+        const valor = professor[campo];
+
+        if (valor === null || valor === undefined) {
+            return false;
+        }
+
+        return String(valor)
+            .toLowerCase()
+            .includes(texto);
+    });
+
+    exibirProfessores(professoresFiltrados);
+}
+
+
+// ======================================================
+// EVENTOS DO FILTRO
+// ======================================================
+
+const textoFiltro = document.getElementById("textoFiltro");
+
+if (textoFiltro) {
+
+    textoFiltro.addEventListener("input", filtrarProfessores);
+
+}
+
+
+const campoFiltro = document.getElementById("campoFiltro");
+
+if (campoFiltro) {
+
+    campoFiltro.addEventListener("change", filtrarProfessores);
+
+}
+
+
+const btnLimparFiltro = document.getElementById("btnLimparFiltro");
+
+if (btnLimparFiltro) {
+
+    btnLimparFiltro.addEventListener("click", function() {
+
+        document.getElementById("textoFiltro").value = "";
+
+        exibirProfessores(professores);
+
+    });
+
+}
+
+
+// ======================================================
+// EXECUTA A LISTAGEM
+// ======================================================
+
 carregarProfessores();

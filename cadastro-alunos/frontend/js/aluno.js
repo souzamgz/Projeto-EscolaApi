@@ -120,6 +120,8 @@ function obterMensagemErro(resultado) {
 // LISTAGEM DE ALUNOS
 // ======================================================
 
+let alunos = [];
+
 async function carregarAlunos() {
 
     const tabela = document.getElementById("listaAlunos");
@@ -136,28 +138,9 @@ async function carregarAlunos() {
             throw new Error("Erro ao buscar alunos.");
         }
 
-        const alunos = await resposta.json();
+        alunos = await resposta.json();
 
-        tabela.innerHTML = "";
-
-        alunos.forEach(aluno => {
-
-            const linha = document.createElement("tr");
-
-            linha.innerHTML = `
-                <td>${aluno.codAluno}</td>
-                <td>${aluno.nome}</td>
-                <td>${aluno.cpf}</td>
-                <td>${aluno.email}</td>
-                <td>${aluno.data_nascimento}</td>
-                <td>${aluno.telefone}</td>
-                <td>${aluno.ra}</td>
-                <td>${aluno.cidade}</td>
-            `;
-
-            tabela.appendChild(linha);
-
-        });
+        exibirAlunos(alunos);
 
     } catch (erro) {
 
@@ -174,5 +157,116 @@ async function carregarAlunos() {
 }
 
 
-// Executa a listagem
+// ======================================================
+// EXIBIR ALUNOS NA TABELA
+// ======================================================
+
+function exibirAlunos(listaAlunos) {
+
+    const tabela = document.getElementById("listaAlunos");
+
+    if (!tabela) {
+        return;
+    }
+
+    tabela.innerHTML = "";
+
+    listaAlunos.forEach(aluno => {
+
+        const linha = document.createElement("tr");
+
+        linha.innerHTML = `
+            <td>${aluno.codAluno}</td>
+            <td>${aluno.nome}</td>
+            <td>${aluno.cpf}</td>
+            <td>${aluno.email}</td>
+            <td>${aluno.data_nascimento}</td>
+            <td>${aluno.telefone}</td>
+            <td>${aluno.ra}</td>
+            <td>${aluno.cidade}</td>
+        `;
+
+        tabela.appendChild(linha);
+
+    });
+}
+
+
+// ======================================================
+// FILTRO DE ALUNOS
+// ======================================================
+
+function filtrarAlunos() {
+
+    const campoElemento = document.getElementById("campoFiltro");
+    const textoElemento = document.getElementById("textoFiltro");
+
+    if (!campoElemento || !textoElemento) {
+        return;
+    }
+
+    const campo = campoElemento.value;
+
+    const texto = textoElemento.value
+        .toLowerCase()
+        .trim();
+
+    const alunosFiltrados = alunos.filter(aluno => {
+
+        const valor = aluno[campo];
+
+        if (valor === null || valor === undefined) {
+            return false;
+        }
+
+        return String(valor)
+            .toLowerCase()
+            .includes(texto);
+    });
+
+    exibirAlunos(alunosFiltrados);
+}
+
+
+// ======================================================
+// EVENTOS DO FILTRO
+// ======================================================
+
+const textoFiltro = document.getElementById("textoFiltro");
+
+if (textoFiltro) {
+
+    textoFiltro.addEventListener("input", filtrarAlunos);
+
+}
+
+
+const campoFiltro = document.getElementById("campoFiltro");
+
+if (campoFiltro) {
+
+    campoFiltro.addEventListener("change", filtrarAlunos);
+
+}
+
+
+const btnLimparFiltro = document.getElementById("btnLimparFiltro");
+
+if (btnLimparFiltro) {
+
+    btnLimparFiltro.addEventListener("click", function() {
+
+        document.getElementById("textoFiltro").value = "";
+
+        exibirAlunos(alunos);
+
+    });
+
+}
+
+
+// ======================================================
+// EXECUTA A LISTAGEM
+// ======================================================
+
 carregarAlunos();
