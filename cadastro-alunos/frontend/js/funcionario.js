@@ -1,56 +1,91 @@
 const formulario = document.getElementById("form-funcionario");
 const mensagem = document.getElementById("mensagem");
 
+const parametros = new URLSearchParams(window.location.search);
+const codFunc = parametros.get("codFunc");
+
 
 if (formulario) {
-    formulario.addEventListener("submit", async function (evento) {
-        evento.preventDefault();
+    formulario.addEventListener(
+        "submit",
+        async function (evento) {
 
-        mensagem.textContent = "";
+            evento.preventDefault();
+            mensagem.textContent = "";
 
-        const funcionario = {
-            nome: document.getElementById("nome").value,
-            cpf: document.getElementById("cpf").value,
-            email: document.getElementById("email").value,
-            data_nascimento: document.getElementById("data_nascimento").value,
-            telefone: document.getElementById("telefone").value,
-            cidade: document.getElementById("cidade").value
-        };
+            const funcionario = {
+                nome: document.getElementById("nome").value,
+                cpf: document.getElementById("cpf").value,
+                email: document.getElementById("email").value,
+                data_nascimento:
+                    document.getElementById("data_nascimento").value,
+                telefone:
+                    document.getElementById("telefone").value,
+                cidade:
+                    document.getElementById("cidade").value
+            };
 
-        try {
+            try {
+                let resposta;
 
-            const resposta = await fetch("/funcionarios", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(funcionario)
-            });
+                if (codFunc) {
+                    resposta = await fetch(
+                        `/funcionarios/${codFunc}`,
+                        {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+                            body: JSON.stringify(funcionario)
+                        }
+                    );
+                } else {
+                    resposta = await fetch(
+                        "/funcionarios",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+                            body: JSON.stringify(funcionario)
+                        }
+                    );
+                }
 
-            const resultado = await resposta.json();
+                const resultado = await resposta.json();
 
-            if (resposta.ok) {
+                if (resposta.ok) {
+                    if (codFunc) {
+                        mensagem.textContent =
+                            "Funcionário alterado com sucesso!";
+                    } else {
+                        mensagem.textContent =
+                            "Funcionário cadastrado com sucesso!";
+                        formulario.reset();
+                    }
+                } else {
+                    mensagem.textContent =
+                        "Erro: " + obterMensagemErro(resultado);
 
-                mensagem.textContent = "Funcionario cadastrado com sucesso!";
+                    console.error(
+                        "Erro da API:",
+                        resultado
+                    );
+                }
 
-                formulario.reset();
+            } catch (erro) {
+                mensagem.textContent =
+                    "Não foi possível conectar ao servidor.";
 
-                console.log("Funcionario cadastrado:", resultado);
-
-            } else {
-
-                mensagem.textContent = "Erro ao cadastrar Funcionario: " + obterMensagemErro(resultado);
-
-                console.error("Erro da API:", resultado);
+                console.error(
+                    "Erro de conexão:",
+                    erro
+                );
             }
-
-        } catch (erro) {
-
-            mensagem.textContent = "Não foi possível conectar ao servidor.";
-
-            console.error("Erro de conexão:", erro);
         }
-    });
+    );
 }
 
 function obterMensagemErro(resultado) {
@@ -126,7 +161,7 @@ async function carregarFuncionarios() {
 
         tabela.innerHTML = `
             <tr>
-                <td colspan="8">
+                <td colspan="9">
                     Erro ao carregar os funcionarios.
                 </td>
             </tr>
@@ -161,6 +196,15 @@ function exibirFuncionarios(listaFuncionarios) {
             <td>${funcionario.data_nascimento}</td>
             <td>${funcionario.telefone}</td>
             <td>${funcionario.cidade}</td>
+             <td>
+                <button
+                    type="button"
+                    class="btn btn-warning btn-sm"
+                    onclick="alterarFuncionario(${funcionario.codFunc})"
+                >
+                    ✏️ Alterar
+                </button>
+            </td>
         `;
 
         tabela.appendChild(linha);
@@ -231,7 +275,7 @@ const btnLimparFiltro = document.getElementById("btnLimparFiltro");
 
 if (btnLimparFiltro) {
 
-    btnLimparFiltro.addEventListener("click", function() {
+    btnLimparFiltro.addEventListener("click", function () {
 
         document.getElementById("textoFiltro").value = "";
 
@@ -247,3 +291,71 @@ if (btnLimparFiltro) {
 // ======================================================
 
 carregarFuncionarios();
+carregarFuncionarioParaAlteracao();
+
+function alterarFuncionario(codFunc) {
+
+    window.location.href =
+        `/frontend/cadastrodefuncionario.html?codFunc=${codFunc}`;
+
+}
+
+async function carregarFuncionarioParaAlteracao() {
+
+    if (!codFunc || !formulario) {
+        return;
+    }
+
+    try {
+        const resposta = await fetch("/funcionarios");
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao buscar funcionários.");
+        }
+
+        const funcionarios = await resposta.json();
+
+        const funcionario = funcionarios.find(
+            funcionario => funcionario.codFunc == codFunc
+        );
+
+        if (!funcionario) {
+            mensagem.textContent =
+                "Funcionário não encontrado.";
+            return;
+        }
+
+        document.getElementById("nome").value =
+            funcionario.nome;
+
+        document.getElementById("cpf").value =
+            funcionario.cpf;
+
+        document.getElementById("email").value =
+            funcionario.email;
+
+        document.getElementById("data_nascimento").value =
+            funcionario.data_nascimento;
+
+        document.getElementById("telefone").value =
+            funcionario.telefone;
+
+        document.getElementById("cidade").value =
+            funcionario.cidade;
+
+        document.getElementById("tituloFormulario").textContent =
+            "Alterar Funcionário";
+
+        document.getElementById("btnSalvar").textContent =
+            "Salvar alterações";
+
+    } catch (erro) {
+        console.error(
+            "Erro ao carregar Funcionário:",
+            erro
+        );
+
+        mensagem.textContent =
+            "Não foi possível carregar os dados do funcionário.";
+    }
+}

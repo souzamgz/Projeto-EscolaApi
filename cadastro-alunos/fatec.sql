@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 26/08/2026 às 23:11
+-- Tempo de geração: 28/08/2026 às 18:53
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -43,8 +43,8 @@ CREATE TABLE `alunos` (
 --
 
 INSERT INTO `alunos` (`codAluno`, `nome`, `cpf`, `email`, `data_nascimento`, `telefone`, `ra`, `cidade`) VALUES
-(1, 'Marcelo', '123456', 'marcelo@teste.com', '1980-02-04', '123456', '987654', 'Mococa'),
-(2, 'Nome', 'CPF', 'EMAIL@email.com', '2006-08-02', 'telefone', 'ra', 'cidade');
+(1, 'Marcelo Alterado', '123456', 'marcelo@teste.com', '1980-02-04', '999999', '987654', 'Mogi Guaçu'),
+(2, 'Nome ALTERADO', 'CPF', 'EMAIL@email.com', '2006-08-02', 'telefone', 'ra', 'cidade');
 
 -- --------------------------------------------------------
 
@@ -67,8 +67,7 @@ CREATE TABLE `funcionario` (
 --
 
 INSERT INTO `funcionario` (`codFunc`, `nome`, `cpf`, `email`, `data_nascimento`, `telefone`, `cidade`) VALUES
-(1, 'Bruno', '789456', 'bruno@cps.sp.gov.br', '2005-12-22', '123456', 'Mogi Guaçu'),
-(2, 'Rosana', '963258', 'rosana@bol.com.br', '1997-08-26', '321654', 'Aguaí');
+(1, 'Bruno', '789456', 'bruno@cps.sp.gov.br', '2005-12-22', '123456', 'Mogi Guaçu');
 
 -- --------------------------------------------------------
 
@@ -91,8 +90,7 @@ CREATE TABLE `professor` (
 --
 
 INSERT INTO `professor` (`codProf`, `nome`, `cpf`, `email`, `data_nascimento`, `telefone`, `cidade`) VALUES
-(1, 'Pedro Ramires', '123456', 'pedro@gmail.com', '1988-02-04', '123456', 'Mococa'),
-(2, 'Reginaldo', '147258', 'reginaldo@gmail.com', '1970-05-20', '987654', 'Mogi Guaçu');
+(1, 'Pedro Ramires', '123456', 'pedro@gmail.com', '1988-02-04', '123456', 'Mococa');
 
 -- --------------------------------------------------------
 
@@ -193,13 +191,13 @@ ALTER TABLE `alunos`
 -- AUTO_INCREMENT de tabela `funcionario`
 --
 ALTER TABLE `funcionario`
-  MODIFY `codFunc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `codFunc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de tabela `professor`
 --
 ALTER TABLE `professor`
-  MODIFY `codProf` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `codProf` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de tabela `turma`

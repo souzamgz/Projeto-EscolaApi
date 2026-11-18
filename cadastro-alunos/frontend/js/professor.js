@@ -1,9 +1,13 @@
 const formulario = document.getElementById("form-professor");
 const mensagem = document.getElementById("mensagem");
 
+const parametros = new URLSearchParams(window.location.search);
+const codProf = parametros.get("codProf");
+
 
 if (formulario) {
     formulario.addEventListener("submit", async function (evento) {
+
         evento.preventDefault();
 
         mensagem.textContent = "";
@@ -12,43 +16,81 @@ if (formulario) {
             nome: document.getElementById("nome").value,
             cpf: document.getElementById("cpf").value,
             email: document.getElementById("email").value,
-            data_nascimento: document.getElementById("data_nascimento").value,
+            data_nascimento:
+                document.getElementById("data_nascimento").value,
             telefone: document.getElementById("telefone").value,
             cidade: document.getElementById("cidade").value
         };
 
         try {
 
-            const resposta = await fetch("/professores", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(professor)
-            });
+            let resposta;
+
+            if (codProf) {
+
+                resposta = await fetch(
+                    `/professores/${codProf}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(professor)
+                    }
+                );
+
+            } else {
+
+                resposta = await fetch(
+                    "/professores",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(professor)
+                    }
+                );
+            }
 
             const resultado = await resposta.json();
 
             if (resposta.ok) {
 
-                mensagem.textContent = "Professor cadastrado com sucesso!";
+                if (codProf) {
 
-                formulario.reset();
+                    mensagem.textContent =
+                        "Professor alterado com sucesso!";
 
-                console.log("Professor cadastrado:", resultado);
+                } else {
+
+                    mensagem.textContent =
+                        "Professor cadastrado com sucesso!";
+
+                    formulario.reset();
+                }
 
             } else {
 
-                mensagem.textContent = "Erro ao cadastrar Professor: " + obterMensagemErro(resultado);
+                mensagem.textContent =
+                    "Erro: " +
+                    obterMensagemErro(resultado);
 
-                console.error("Erro da API:", resultado);
+                console.error(
+                    "Erro da API:",
+                    resultado
+                );
             }
 
         } catch (erro) {
 
-            mensagem.textContent = "Não foi possível conectar ao servidor.";
+            mensagem.textContent =
+                "Não foi possível conectar ao servidor.";
 
-            console.error("Erro de conexão:", erro);
+            console.error(
+                "Erro de conexão:",
+                erro
+            );
         }
     });
 }
@@ -126,7 +168,7 @@ async function carregarProfessores() {
 
         tabela.innerHTML = `
             <tr>
-                <td colspan="8">
+                <td colspan="9">
                     Erro ao carregar os professores.
                 </td>
             </tr>
@@ -161,6 +203,15 @@ function exibirProfessores(listaProfessores) {
             <td>${professor.data_nascimento}</td>
             <td>${professor.telefone}</td>
             <td>${professor.cidade}</td>
+            <td>
+                <button
+                    type="button"
+                    class="btn btn-warning btn-sm"
+                    onclick="alterarProfessor(${professor.codProf})"
+                >
+                    ✏️ Alterar
+                </button>
+            </td>
         `;
 
         tabela.appendChild(linha);
@@ -231,7 +282,7 @@ const btnLimparFiltro = document.getElementById("btnLimparFiltro");
 
 if (btnLimparFiltro) {
 
-    btnLimparFiltro.addEventListener("click", function() {
+    btnLimparFiltro.addEventListener("click", function () {
 
         document.getElementById("textoFiltro").value = "";
 
@@ -247,3 +298,75 @@ if (btnLimparFiltro) {
 // ======================================================
 
 carregarProfessores();
+carregarProfessorParaAlteracao();
+
+function alterarProfessor(codProf) {
+
+    window.location.href =
+        `/frontend/cadastrodeprofessor.html?codProf=${codProf}`;
+
+}
+
+async function carregarProfessorParaAlteracao() {
+
+    if (!codProf || !formulario) {
+        return;
+    }
+
+    try {
+
+        const resposta = await fetch(`/professores`);
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao buscar professores.");
+        }
+
+        const professores = await resposta.json();
+
+        const professor = professores.find(
+            professor => professor.codProf == codProf
+        );
+
+        if (!professor) {
+
+            mensagem.textContent =
+                "Professor não encontrado.";
+
+            return;
+        }
+
+        document.getElementById("nome").value =
+            professor.nome;
+
+        document.getElementById("cpf").value =
+            professor.cpf;
+
+        document.getElementById("email").value =
+            professor.email;
+
+        document.getElementById("data_nascimento").value =
+            professor.data_nascimento;
+
+        document.getElementById("telefone").value =
+            professor.telefone;
+
+        document.getElementById("cidade").value =
+            professor.cidade;
+
+        document.getElementById("tituloFormulario").textContent =
+            "Alterar Professor";
+
+        document.getElementById("btnSalvar").textContent =
+            "Salvar alterações";
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar professor:",
+            erro
+        );
+
+        mensagem.textContent =
+            "Não foi possível carregar os dados do professor.";
+    }
+}

@@ -1,6 +1,9 @@
 const formulario = document.getElementById("form-aluno");
 const mensagem = document.getElementById("mensagem");
 
+const parametros = new URLSearchParams(window.location.search);
+const codAluno = parametros.get("codAluno");
+
 
 // ======================================================
 // CADASTRO DE ALUNO
@@ -8,7 +11,8 @@ const mensagem = document.getElementById("mensagem");
 
 if (formulario) {
 
-    formulario.addEventListener("submit", async function(evento) {
+    formulario.addEventListener("submit", async function (evento) {
+
         evento.preventDefault();
 
         mensagem.textContent = "";
@@ -17,7 +21,8 @@ if (formulario) {
             nome: document.getElementById("nome").value,
             cpf: document.getElementById("cpf").value,
             email: document.getElementById("email").value,
-            data_nascimento: document.getElementById("data_nascimento").value,
+            data_nascimento:
+                document.getElementById("data_nascimento").value,
             telefone: document.getElementById("telefone").value,
             ra: document.getElementById("ra").value,
             cidade: document.getElementById("cidade").value
@@ -25,29 +30,62 @@ if (formulario) {
 
         try {
 
-            const resposta = await fetch("/alunos", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(aluno)
-            });
+            let resposta;
+
+            if (codAluno) {
+
+                resposta = await fetch(
+                    `/alunos/${codAluno}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(aluno)
+                    }
+                );
+
+            } else {
+
+                resposta = await fetch(
+                    "/alunos",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(aluno)
+                    }
+                );
+            }
 
             const resultado = await resposta.json();
 
             if (resposta.ok) {
 
-                mensagem.textContent = "Aluno cadastrado com sucesso!";
+                if (codAluno) {
 
-                formulario.reset();
+                    mensagem.textContent =
+                        "Aluno alterado com sucesso!";
+
+                } else {
+
+                    mensagem.textContent =
+                        "Aluno cadastrado com sucesso!";
+
+                    formulario.reset();
+                }
 
             } else {
 
                 mensagem.textContent =
-                    "Erro ao cadastrar aluno: " +
+                    "Erro: " +
                     obterMensagemErro(resultado);
 
-                console.error("Erro da API:", resultado);
+                console.error(
+                    "Erro da API:",
+                    resultado
+                );
             }
 
         } catch (erro) {
@@ -55,7 +93,10 @@ if (formulario) {
             mensagem.textContent =
                 "Não foi possível conectar ao servidor.";
 
-            console.error("Erro de conexão:", erro);
+            console.error(
+                "Erro de conexão:",
+                erro
+            );
         }
     });
 
@@ -148,7 +189,7 @@ async function carregarAlunos() {
 
         tabela.innerHTML = `
             <tr>
-                <td colspan="8">
+                <td colspan="9">
                     Erro ao carregar os alunos.
                 </td>
             </tr>
@@ -184,6 +225,15 @@ function exibirAlunos(listaAlunos) {
             <td>${aluno.telefone}</td>
             <td>${aluno.ra}</td>
             <td>${aluno.cidade}</td>
+            <td>
+                <button
+                    type="button"
+                    class="btn btn-warning btn-sm"
+                    onclick="alterarAluno(${aluno.codAluno})"
+                >
+                    ✏️ Alterar
+                </button>
+            </td>
         `;
 
         tabela.appendChild(linha);
@@ -254,7 +304,7 @@ const btnLimparFiltro = document.getElementById("btnLimparFiltro");
 
 if (btnLimparFiltro) {
 
-    btnLimparFiltro.addEventListener("click", function() {
+    btnLimparFiltro.addEventListener("click", function () {
 
         document.getElementById("textoFiltro").value = "";
 
@@ -270,3 +320,82 @@ if (btnLimparFiltro) {
 // ======================================================
 
 carregarAlunos();
+carregarAlunoParaAlteracao();
+
+
+// ======================================================
+// CHAMA A FUNÇÃO DE ALTERAÇÃO DOS DADOS
+// ======================================================
+function alterarAluno(codAluno) {
+
+    window.location.href =
+        `/frontend/cadastrodealuno.html?codAluno=${codAluno}`;
+
+}
+
+async function carregarAlunoParaAlteracao() {
+
+    if (!codAluno || !formulario) {
+        return;
+    }
+
+    try {
+
+        const resposta = await fetch(`/alunos`);
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao buscar alunos.");
+        }
+
+        const alunos = await resposta.json();
+
+        const aluno = alunos.find(
+            aluno => aluno.codAluno == codAluno
+        );
+
+        if (!aluno) {
+
+            mensagem.textContent =
+                "Aluno não encontrado.";
+
+            return;
+        }
+
+        document.getElementById("nome").value =
+            aluno.nome;
+
+        document.getElementById("cpf").value =
+            aluno.cpf;
+
+        document.getElementById("email").value =
+            aluno.email;
+
+        document.getElementById("data_nascimento").value =
+            aluno.data_nascimento;
+
+        document.getElementById("telefone").value =
+            aluno.telefone;
+
+        document.getElementById("ra").value =
+            aluno.ra;
+
+        document.getElementById("cidade").value =
+            aluno.cidade;
+
+        document.getElementById("tituloFormulario").textContent =
+            "Alterar Aluno";
+
+        document.getElementById("btnSalvar").textContent =
+            "Salvar alterações";
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar aluno:",
+            erro
+        );
+
+        mensagem.textContent =
+            "Não foi possível carregar os dados do aluno.";
+    }
+}
