@@ -14,7 +14,7 @@ class AlunoCreate(BaseModel):
 
 
 class AlunoResponse(BaseModel):
-    id: int
+    codAluno: int
     nome: str
     cpf: str
     email: EmailStr
@@ -33,7 +33,7 @@ class ProfessorCreate(BaseModel):
 
 
 class ProfessorResponse(BaseModel):
-    id: int
+    codProf: int
     nome: str
     cpf: str
     email: EmailStr
@@ -51,7 +51,7 @@ class FuncionarioCreate(BaseModel):
 
 
 class FuncionarioResponse(BaseModel):
-    id: int
+    codFunc: int
     nome: str
     cpf: str
     email: EmailStr

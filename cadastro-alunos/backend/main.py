@@ -251,7 +251,7 @@ def cadastrar_funcionario(funcionario: FuncionarioCreate):
         id_funcionario = cursor.lastrowid
 
         return {
-            "id": id_funcionario,
+            "codFunc": id_funcionario,
             "nome": funcionario.nome,
             "cpf": funcionario.cpf,
             "email": funcionario.email,

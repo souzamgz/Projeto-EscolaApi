@@ -1,55 +1,57 @@
 const formulario = document.getElementById("form-professor");
 const mensagem = document.getElementById("mensagem");
 
-formulario.addEventListener("submit", async function(evento) {
-    evento.preventDefault();
 
-    mensagem.textContent = "";
+if (formulario) {
+    formulario.addEventListener("submit", async function (evento) {
+        evento.preventDefault();
 
-    const professor = {
-        nome: document.getElementById("nome").value,
-        cpf: document.getElementById("cpf").value,
-        email: document.getElementById("email").value,
-        data_nascimento: document.getElementById("data_nascimento").value,
-        telefone: document.getElementById("telefone").value,
-        cidade: document.getElementById("cidade").value
-    };
+        mensagem.textContent = "";
 
-    try {
+        const professor = {
+            nome: document.getElementById("nome").value,
+            cpf: document.getElementById("cpf").value,
+            email: document.getElementById("email").value,
+            data_nascimento: document.getElementById("data_nascimento").value,
+            telefone: document.getElementById("telefone").value,
+            cidade: document.getElementById("cidade").value
+        };
 
-        const resposta = await fetch("/professores", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(professor)
-        });
+        try {
 
-        const resultado = await resposta.json();
+            const resposta = await fetch("/professores", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(professor)
+            });
 
-        if (resposta.ok) {
+            const resultado = await resposta.json();
 
-            mensagem.textContent = "Professor cadastrado com sucesso!";
+            if (resposta.ok) {
 
-            formulario.reset();
+                mensagem.textContent = "Professor cadastrado com sucesso!";
 
-            console.log("Professor cadastrado:", resultado);
+                formulario.reset();
 
-        } else {
+                console.log("Professor cadastrado:", resultado);
 
-            mensagem.textContent = "Erro ao cadastrar Professor: " + obterMensagemErro(resultado);
+            } else {
 
-            console.error("Erro da API:", resultado);
+                mensagem.textContent = "Erro ao cadastrar Professor: " + obterMensagemErro(resultado);
+
+                console.error("Erro da API:", resultado);
+            }
+
+        } catch (erro) {
+
+            mensagem.textContent = "Não foi possível conectar ao servidor.";
+
+            console.error("Erro de conexão:", erro);
         }
-
-    } catch (erro) {
-
-        mensagem.textContent = "Não foi possível conectar ao servidor.";
-
-        console.error("Erro de conexão:", erro);
-    }
-});
-
+    });
+}
 
 function obterMensagemErro(resultado) {
 
@@ -79,7 +81,7 @@ function obterMensagemErro(resultado) {
                 if (campo === "data_nascimento") {
                     return "Data de nascimento inválida.";
                 }
-                
+
                 if (campo === "telefone") {
                     return "Telefone inválido.";
                 }
@@ -95,3 +97,59 @@ function obterMensagemErro(resultado) {
 
     return resultado.detail;
 }
+
+async function carregarProfessores() {
+
+    const tabela = document.getElementById("listaProfessores");
+
+    if (!tabela) {
+        return;
+    }
+
+    try {
+
+        const resposta = await fetch("/professores");
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao buscar professores.");
+        }
+
+        const professores = await resposta.json();
+
+        tabela.innerHTML = "";
+
+        professores.forEach(professor => {
+
+            const linha = document.createElement("tr");
+
+            linha.innerHTML = `
+                <td>${professor.codProf}</td>
+                <td>${professor.nome}</td>
+                <td>${professor.cpf}</td>
+                <td>${professor.email}</td>
+                <td>${professor.data_nascimento}</td>
+                <td>${professor.telefone}</td>
+                <td>${professor.cidade}</td>
+            `;
+
+            tabela.appendChild(linha);
+
+        });
+
+    } catch (erro) {
+
+        console.error("Erro ao carregar professores:", erro);
+
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="8">
+                    Erro ao carregar os professores.
+                </td>
+            </tr>
+        `;
+    }
+}
+
+
+// Executa a listagem
+carregarProfessores();
