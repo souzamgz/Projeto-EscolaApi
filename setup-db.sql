@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS fatec
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
+
+CREATE USER IF NOT EXISTS 'escola'@'localhost' IDENTIFIED BY 'escola123';
+CREATE USER IF NOT EXISTS 'escola'@'127.0.0.1' IDENTIFIED BY 'escola123';
+
+GRANT ALL PRIVILEGES ON fatec.* TO 'escola'@'localhost';
+GRANT ALL PRIVILEGES ON fatec.* TO 'escola'@'127.0.0.1';
+
+FLUSH PRIVILEGES;
