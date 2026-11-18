@@ -53,3 +53,31 @@ export async function alterarAluno(codAluno, aluno) {
 
   return dados;
 }
+
+export async function excluirAluno(codAluno) {
+  const resposta = await fetch(`${API_URL}/alunos/${codAluno}`, {
+    method: "DELETE",
+  });
+
+  if (!resposta.ok) {
+    let mensagem = "Não foi possível excluir o aluno.";
+
+    try {
+      const dados = await resposta.json();
+
+      if (typeof dados.detail === "string") {
+        mensagem = dados.detail;
+      }
+    } catch {
+      // A API pode responder sem um corpo JSON.
+    }
+
+    throw new Error(mensagem);
+  }
+
+  if (resposta.status === 204) {
+    return;
+  }
+
+  return resposta.json();
+}

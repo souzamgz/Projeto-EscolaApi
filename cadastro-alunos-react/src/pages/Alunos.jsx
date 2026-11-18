@@ -4,6 +4,7 @@ import {
   listarAlunos,
   cadastrarAluno,
   alterarAluno,
+  excluirAluno,
 } from "../services/api";
 
 const formularioVazio = {
@@ -115,6 +116,27 @@ function Alunos() {
     }
   }
 
+  async function removerAluno(codAluno) {
+    const confirmar = window.confirm(
+      "Tem certeza de que deseja excluir este aluno? Essa ação não poderá ser desfeita."
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    setErro("");
+    setMensagem("");
+
+    try {
+      await excluirAluno(codAluno);
+      setMensagem("Aluno excluído com sucesso!");
+      await carregarAlunos();
+    } catch (erro) {
+      setErro(erro.message || "Não foi possível excluir o aluno.");
+    }
+  }
+
   const alunosFiltrados = alunos.filter((aluno) => {
     const valor = aluno[campoFiltro];
 
@@ -141,10 +163,7 @@ function Alunos() {
       </div>
 
       {!mostrarFormulario && (
-        <button
-          className="botao botao-principal"
-          onClick={abrirFormulario}
-        >
+        <button className="botao botao-principal" onClick={abrirFormulario}>
           Cadastrar aluno
         </button>
       )}
@@ -154,9 +173,7 @@ function Alunos() {
 
       {mostrarFormulario && (
         <section className="formulario">
-          <h2>
-            {alunoEditando !== null ? "Alterar aluno" : "Novo aluno"}
-          </h2>
+          <h2>{alunoEditando !== null ? "Alterar aluno" : "Novo aluno"}</h2>
 
           <form onSubmit={salvarAluno}>
             <div className="campos">
@@ -351,6 +368,14 @@ function Alunos() {
                       onClick={() => prepararEdicao(aluno)}
                     >
                       Alterar
+                    </button>
+
+                    <button
+                      type="button"
+                      className="botao botao-excluir"
+                      onClick={() => removerAluno(aluno.codAluno)}
+                    >
+                      Excluir
                     </button>
                   </td>
                 </tr>
