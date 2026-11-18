@@ -65,6 +65,8 @@ body {
   border-radius: 8px;
   text-decoration: none;
   text-align: center;
+  cursor: pointer;
+  font: inherit;
 }
 
 .botao-principal {
@@ -213,6 +215,24 @@ tbody tr:hover {
   padding: 16px;
   background: white;
   border-radius: 8px;
+}
+
+.acoes-tabela {
+  display: flex;
+  gap: 8px;
+}
+
+.botao-editar {
+  background: #0f766e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.botao-editar:hover {
+  background: #115e59;
 }
 
 .filtros label {

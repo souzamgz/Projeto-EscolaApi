@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { listarAlunos, cadastrarAluno } from "../services/api";
+import {
+  listarAlunos,
+  cadastrarAluno,
+  alterarAluno,
+} from "../services/api";
 
 const formularioVazio = {
   nome: "",
@@ -20,6 +24,7 @@ function Alunos() {
   const [erro, setErro] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
+  const [alunoEditando, setAlunoEditando] = useState(null);
   const [campoFiltro, setCampoFiltro] = useState("nome");
   const [textoFiltro, setTextoFiltro] = useState("");
 
@@ -53,6 +58,7 @@ function Alunos() {
 
   function abrirFormulario() {
     setFormulario(formularioVazio);
+    setAlunoEditando(null);
     setMensagem("");
     setErro("");
     setSearchParams({ acao: "cadastrar" });
@@ -60,7 +66,27 @@ function Alunos() {
 
   function fecharFormulario() {
     setFormulario(formularioVazio);
+    setAlunoEditando(null);
     setSearchParams({});
+  }
+
+  function prepararEdicao(aluno) {
+    setFormulario({
+      nome: aluno.nome ?? "",
+      cpf: aluno.cpf ?? "",
+      email: aluno.email ?? "",
+      data_nascimento: aluno.data_nascimento
+        ? String(aluno.data_nascimento).slice(0, 10)
+        : "",
+      telefone: aluno.telefone ?? "",
+      ra: aluno.ra ?? "",
+      cidade: aluno.cidade ?? "",
+    });
+
+    setAlunoEditando(aluno.codAluno);
+    setMensagem("");
+    setErro("");
+    setSearchParams({ acao: "cadastrar" });
   }
 
   async function salvarAluno(evento) {
@@ -70,13 +96,20 @@ function Alunos() {
     setMensagem("");
 
     try {
-      await cadastrarAluno(formulario);
-      setMensagem("Aluno cadastrado com sucesso!");
+      if (alunoEditando !== null) {
+        await alterarAluno(alunoEditando, formulario);
+        setMensagem("Aluno alterado com sucesso!");
+      } else {
+        await cadastrarAluno(formulario);
+        setMensagem("Aluno cadastrado com sucesso!");
+      }
+
       setFormulario(formularioVazio);
+      setAlunoEditando(null);
       setSearchParams({});
       await carregarAlunos();
     } catch (erro) {
-      setErro(erro.message || "Não foi possível cadastrar o aluno.");
+      setErro(erro.message || "Não foi possível salvar o aluno.");
     } finally {
       setSalvando(false);
     }
@@ -121,7 +154,9 @@ function Alunos() {
 
       {mostrarFormulario && (
         <section className="formulario">
-          <h2>Novo aluno</h2>
+          <h2>
+            {alunoEditando !== null ? "Alterar aluno" : "Novo aluno"}
+          </h2>
 
           <form onSubmit={salvarAluno}>
             <div className="campos">
@@ -210,7 +245,11 @@ function Alunos() {
                 type="submit"
                 disabled={salvando}
               >
-                {salvando ? "Salvando..." : "Salvar aluno"}
+                {salvando
+                  ? "Salvando..."
+                  : alunoEditando !== null
+                    ? "Salvar alterações"
+                    : "Cadastrar aluno"}
               </button>
 
               <button
@@ -290,6 +329,7 @@ function Alunos() {
                 <th>Telefone</th>
                 <th>RA</th>
                 <th>Cidade</th>
+                <th>Ações</th>
               </tr>
             </thead>
 
@@ -304,12 +344,21 @@ function Alunos() {
                   <td>{aluno.telefone}</td>
                   <td>{aluno.ra}</td>
                   <td>{aluno.cidade}</td>
+                  <td className="acoes-tabela">
+                    <button
+                      type="button"
+                      className="botao botao-editar"
+                      onClick={() => prepararEdicao(aluno)}
+                    >
+                      Alterar
+                    </button>
+                  </td>
                 </tr>
               ))}
 
               {alunosFiltrados.length === 0 && (
                 <tr>
-                  <td colSpan="8">
+                  <td colSpan="9">
                     {alunos.length === 0
                       ? "Nenhum aluno cadastrado."
                       : "Nenhum aluno encontrado para esse filtro."}

@@ -31,3 +31,25 @@ export async function cadastrarAluno(aluno) {
 
   return dados;
 }
+
+export async function alterarAluno(codAluno, aluno) {
+  const resposta = await fetch(`${API_URL}/alunos/${codAluno}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(aluno),
+  });
+
+  const dados = await resposta.json();
+
+  if (!resposta.ok) {
+    throw new Error(
+      typeof dados.detail === "string"
+        ? dados.detail
+        : "Não foi possível alterar o aluno."
+    );
+  }
+
+  return dados;
+}
