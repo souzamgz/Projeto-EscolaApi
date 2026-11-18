@@ -205,6 +205,15 @@ function exibirFuncionarios(listaFuncionarios) {
                     ✏️ Alterar
                 </button>
             </td>
+            <td>
+                <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                     onclick="excluirFuncionario(${funcionario.codFunc}, '${funcionario.nome}')"
+                 >
+                    🗑️ Excluir
+                </button>
+            </td>
         `;
 
         tabela.appendChild(linha);
@@ -357,5 +366,60 @@ async function carregarFuncionarioParaAlteracao() {
 
         mensagem.textContent =
             "Não foi possível carregar os dados do funcionário.";
+    }
+}
+
+// ======================================================
+// CHAMA A FUNÇÃO DE EXLUIR DADOS
+// ======================================================
+async function excluirFuncionario(codFunc, nomeFunc) {
+
+    const confirmar = confirm(
+        `Deseja realmente excluir o funcionário ${nomeFunc}?`
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    try {
+
+        const resposta = await fetch(
+            `/funcionarios/${codFunc}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok) {
+
+            alert("Funcionário excluído com sucesso!");
+
+            carregarFuncionarios();
+
+        } else {
+
+            alert(
+                "Erro: " + obterMensagemErro(resultado)
+            );
+
+            console.error(
+                "Erro da API:",
+                resultado
+            );
+        }
+
+    } catch (erro) {
+
+        alert(
+            "Não foi possível conectar ao servidor."
+        );
+
+        console.error(
+            "Erro de conexão:",
+            erro
+        );
     }
 }

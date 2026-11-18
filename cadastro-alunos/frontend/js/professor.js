@@ -212,6 +212,15 @@ function exibirProfessores(listaProfessores) {
                     ✏️ Alterar
                 </button>
             </td>
+            <td>
+                <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                     onclick="excluirProfessor(${professor.codProf}, '${professor.nome}')"
+                 >
+                    🗑️ Excluir
+                </button>
+            </td>
         `;
 
         tabela.appendChild(linha);
@@ -368,5 +377,60 @@ async function carregarProfessorParaAlteracao() {
 
         mensagem.textContent =
             "Não foi possível carregar os dados do professor.";
+    }
+}
+
+// ======================================================
+// CHAMA A FUNÇÃO DE EXLUIR DADOS
+// ======================================================
+async function excluirProfessor(codProf, nomeProf) {
+
+    const confirmar = confirm(
+        `Deseja realmente excluir o professor ${nomeProf}?`
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    try {
+
+        const resposta = await fetch(
+            `/professores/${codProf}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok) {
+
+            alert("Professor excluído com sucesso!");
+
+            carregarProfessores();
+
+        } else {
+
+            alert(
+                "Erro: " + obterMensagemErro(resultado)
+            );
+
+            console.error(
+                "Erro da API:",
+                resultado
+            );
+        }
+
+    } catch (erro) {
+
+        alert(
+            "Não foi possível conectar ao servidor."
+        );
+
+        console.error(
+            "Erro de conexão:",
+            erro
+        );
     }
 }

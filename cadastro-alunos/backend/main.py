@@ -183,6 +183,47 @@ def alterar_aluno(codAluno: int, aluno: AlunoCreate):
         cursor.close()
         conexao.close()
 
+@app.delete("/alunos/{codAluno}")
+def excluir_aluno(codAluno: int):
+
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+
+    sql = """
+        DELETE FROM alunos
+        WHERE codAluno = %s
+    """
+
+    try:
+
+        cursor.execute(sql, (codAluno,))
+
+        if cursor.rowcount == 0:
+            raise HTTPException(
+                status_code=404,
+                detail="Aluno não encontrado."
+            )
+
+        conexao.commit()
+
+        return {
+            "mensagem": "Aluno excluído com sucesso."
+        }
+
+    except IntegrityError:
+
+        conexao.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Não foi possível excluir o aluno."
+        )
+
+    finally:
+
+        cursor.close()
+        conexao.close()
+
 @app.get("/professores", response_model=list[ProfessorResponse])
 def listar_professores():
     conexao = criar_conexao()
@@ -340,6 +381,47 @@ def alterar_professor(codProf: int, professor: ProfessorCreate):
         conexao.close()
 
 
+@app.delete("/professores/{codProf}")
+def excluir_professor(codProf: int):
+
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+
+    sql = """
+        DELETE FROM professor
+        WHERE codProf = %s
+    """
+
+    try:
+
+        cursor.execute(sql, (codProf,))
+
+        if cursor.rowcount == 0:
+            raise HTTPException(
+                status_code=404,
+                detail="Professor não encontrado."
+            )
+
+        conexao.commit()
+
+        return {
+            "mensagem": "Professor excluído com sucesso."
+        }
+
+    except IntegrityError:
+
+        conexao.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Não foi possível excluir o professor."
+        )
+
+    finally:
+
+        cursor.close()
+        conexao.close()
+
 @app.get("/funcionarios", response_model=list[FuncionarioResponse])
 def listar_funcionarios():
     conexao = criar_conexao()
@@ -488,6 +570,47 @@ def alterar_funcionario(codFunc: int, funcionario: FuncionarioCreate):
         raise HTTPException(
             status_code=500,
             detail="Erro de integridade no banco de dados."
+        )
+
+    finally:
+
+        cursor.close()
+        conexao.close()
+
+@app.delete("/funcionarios/{codFunc}")
+def excluir_funcionario(codFunc: int):
+
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+
+    sql = """
+        DELETE FROM funcionario
+        WHERE codFunc = %s
+    """
+
+    try:
+
+        cursor.execute(sql, (codFunc,))
+
+        if cursor.rowcount == 0:
+            raise HTTPException(
+                status_code=404,
+                detail="Funcionário não encontrado."
+            )
+
+        conexao.commit()
+
+        return {
+            "mensagem": "Funcionário excluído com sucesso."
+        }
+
+    except IntegrityError:
+
+        conexao.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Não foi possível excluir o funcionário."
         )
 
     finally:
