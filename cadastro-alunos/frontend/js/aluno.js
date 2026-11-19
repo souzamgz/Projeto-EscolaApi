@@ -4,11 +4,6 @@ const mensagem = document.getElementById("mensagem");
 const parametros = new URLSearchParams(window.location.search);
 const codAluno = parametros.get("codAluno");
 
-
-// ======================================================
-// CADASTRO DE ALUNO
-// ======================================================
-
 if (formulario) {
 
     formulario.addEventListener("submit", async function (evento) {
@@ -102,11 +97,6 @@ if (formulario) {
 
 }
 
-
-// ======================================================
-// MENSAGENS DE ERRO
-// ======================================================
-
 function obterMensagemErro(resultado) {
 
     if (!resultado.detail) {
@@ -156,11 +146,6 @@ function obterMensagemErro(resultado) {
     return resultado.detail;
 }
 
-
-// ======================================================
-// LISTAGEM DE ALUNOS
-// ======================================================
-
 let alunos = [];
 
 async function carregarAlunos() {
@@ -196,11 +181,6 @@ async function carregarAlunos() {
         `;
     }
 }
-
-
-// ======================================================
-// EXIBIR ALUNOS NA TABELA
-// ======================================================
 
 function exibirAlunos(listaAlunos) {
 
@@ -250,11 +230,6 @@ function exibirAlunos(listaAlunos) {
     });
 }
 
-
-// ======================================================
-// FILTRO DE ALUNOS
-// ======================================================
-
 function filtrarAlunos() {
 
     const campoElemento = document.getElementById("campoFiltro");
@@ -286,11 +261,6 @@ function filtrarAlunos() {
     exibirAlunos(alunosFiltrados);
 }
 
-
-// ======================================================
-// EVENTOS DO FILTRO
-// ======================================================
-
 const textoFiltro = document.getElementById("textoFiltro");
 
 if (textoFiltro) {
@@ -299,7 +269,6 @@ if (textoFiltro) {
 
 }
 
-
 const campoFiltro = document.getElementById("campoFiltro");
 
 if (campoFiltro) {
@@ -307,7 +276,6 @@ if (campoFiltro) {
     campoFiltro.addEventListener("change", filtrarAlunos);
 
 }
-
 
 const btnLimparFiltro = document.getElementById("btnLimparFiltro");
 
@@ -323,18 +291,9 @@ if (btnLimparFiltro) {
 
 }
 
-
-// ======================================================
-// EXECUTA A LISTAGEM
-// ======================================================
-
 carregarAlunos();
 carregarAlunoParaAlteracao();
 
-
-// ======================================================
-// CHAMA A FUNÇÃO DE ALTERAÇÃO DOS DADOS
-// ======================================================
 function alterarAluno(codAluno) {
 
     window.location.href =
@@ -409,10 +368,6 @@ async function carregarAlunoParaAlteracao() {
     }
 }
 
-
-// ======================================================
-// CHAMA A FUNÇÃO DE EXLUIR DADOS
-// ======================================================
 async function excluirAluno(codAluno, nomeAluno) {
 
     const confirmar = confirm(

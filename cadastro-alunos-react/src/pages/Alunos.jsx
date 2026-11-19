@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
 import {
   listarAlunos,
   cadastrarAluno,
@@ -99,10 +100,10 @@ function Alunos() {
     try {
       if (alunoEditando !== null) {
         await alterarAluno(alunoEditando, formulario);
-        setMensagem("Aluno alterado com sucesso!");
+        setMensagem("Aluno alterado com sucesso.");
       } else {
         await cadastrarAluno(formulario);
-        setMensagem("Aluno cadastrado com sucesso!");
+        setMensagem("Aluno cadastrado com sucesso.");
       }
 
       setFormulario(formularioVazio);
@@ -130,7 +131,7 @@ function Alunos() {
 
     try {
       await excluirAluno(codAluno);
-      setMensagem("Aluno excluído com sucesso!");
+      setMensagem("Aluno excluído com sucesso.");
       await carregarAlunos();
     } catch (erro) {
       setErro(erro.message || "Não foi possível excluir o aluno.");
@@ -150,35 +151,60 @@ function Alunos() {
   });
 
   return (
-    <main className="pagina">
-      <div className="topo-pagina">
-        <div>
-          <h1>Cadastro de Alunos</h1>
-          <p>Consulte os alunos cadastrados ou realize um novo cadastro.</p>
-        </div>
+    <section className="pagina">
+      <PageHeader
+        titulo="Alunos"
+        descricao="Consulte, cadastre, altere e exclua os alunos da escola."
+        acao={
+          !mostrarFormulario ? (
+            <button
+              className="botao botao-principal"
+              type="button"
+              onClick={abrirFormulario}
+            >
+              Novo aluno
+            </button>
+          ) : null
+        }
+      />
 
-        <Link className="botao botao-secundario" to="/">
-          Voltar ao início
-        </Link>
-      </div>
-
-      {!mostrarFormulario && (
-        <button className="botao botao-principal" onClick={abrirFormulario}>
-          Cadastrar aluno
-        </button>
+      {mensagem && (
+        <p className="alerta alerta-sucesso" role="status">
+          {mensagem}
+        </p>
       )}
 
-      {mensagem && <p className="mensagem-sucesso">{mensagem}</p>}
-      {erro && <p className="mensagem-erro">{erro}</p>}
+      {erro && (
+        <p className="alerta alerta-erro" role="alert">
+          {erro}
+        </p>
+      )}
 
       {mostrarFormulario && (
-        <section className="formulario">
-          <h2>{alunoEditando !== null ? "Alterar aluno" : "Novo aluno"}</h2>
+        <section className="cartao formulario">
+          <div className="cartao-topo">
+            <div>
+              <h2>{alunoEditando !== null ? "Alterar aluno" : "Novo aluno"}</h2>
+              <p className="cartao-descricao">
+                {alunoEditando !== null
+                  ? "Atualize os dados do aluno selecionado."
+                  : "Preencha os dados para cadastrar um novo aluno."}
+              </p>
+            </div>
+
+            <button
+              className="botao botao-fantasma botao-pequeno"
+              type="button"
+              onClick={fecharFormulario}
+            >
+              Fechar
+            </button>
+          </div>
 
           <form onSubmit={salvarAluno}>
             <div className="campos">
               <label>
-                Nome
+                <span>Nome</span>
                 <input
                   name="nome"
                   value={formulario.nome}
@@ -189,7 +215,7 @@ function Alunos() {
               </label>
 
               <label>
-                CPF
+                <span>CPF</span>
                 <input
                   name="cpf"
                   value={formulario.cpf}
@@ -200,7 +226,7 @@ function Alunos() {
               </label>
 
               <label>
-                E-mail
+                <span>E-mail</span>
                 <input
                   name="email"
                   type="email"
@@ -212,7 +238,7 @@ function Alunos() {
               </label>
 
               <label>
-                Data de nascimento
+                <span>Data de nascimento</span>
                 <input
                   name="data_nascimento"
                   type="date"
@@ -223,7 +249,7 @@ function Alunos() {
               </label>
 
               <label>
-                Telefone
+                <span>Telefone</span>
                 <input
                   name="telefone"
                   value={formulario.telefone}
@@ -234,7 +260,7 @@ function Alunos() {
               </label>
 
               <label>
-                RA
+                <span>RA</span>
                 <input
                   name="ra"
                   value={formulario.ra}
@@ -245,7 +271,7 @@ function Alunos() {
               </label>
 
               <label>
-                Cidade
+                <span>Cidade</span>
                 <input
                   name="cidade"
                   value={formulario.cidade}
@@ -270,7 +296,7 @@ function Alunos() {
               </button>
 
               <button
-                className="botao botao-cancelar"
+                className="botao botao-secundario"
                 type="button"
                 onClick={fecharFormulario}
               >
@@ -281,120 +307,136 @@ function Alunos() {
         </section>
       )}
 
-      <section className="filtros">
-        <label>
-          Filtrar por
-          <select
-            value={campoFiltro}
-            onChange={(evento) => setCampoFiltro(evento.target.value)}
-          >
-            <option value="codAluno">Código</option>
-            <option value="nome">Nome</option>
-            <option value="cpf">CPF</option>
-            <option value="email">E-mail</option>
-            <option value="data_nascimento">Data de nascimento</option>
-            <option value="telefone">Telefone</option>
-            <option value="ra">RA</option>
-            <option value="cidade">Cidade</option>
-          </select>
-        </label>
-
-        <label>
-          Texto para buscar
-          <input
-            type="text"
-            value={textoFiltro}
-            onChange={(evento) => setTextoFiltro(evento.target.value)}
-            placeholder="Digite o que deseja encontrar"
-          />
-        </label>
-
-        <button
-          type="button"
-          className="botao botao-principal"
-          onClick={() => setTextoFiltro((texto) => texto.trim())}
-        >
-          Filtrar
-        </button>
-
-        <button
-          type="button"
-          className="botao botao-secundario"
-          onClick={() => {
-            setCampoFiltro("nome");
-            setTextoFiltro("");
-          }}
-        >
-          Limpar
-        </button>
-      </section>
-
-      <h2>Alunos cadastrados</h2>
-
-      {carregando ? (
-        <p>Carregando alunos...</p>
-      ) : (
-        <div className="tabela-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Nome</th>
-                <th>CPF</th>
-                <th>E-mail</th>
-                <th>Data de nascimento</th>
-                <th>Telefone</th>
-                <th>RA</th>
-                <th>Cidade</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {alunosFiltrados.map((aluno) => (
-                <tr key={aluno.codAluno}>
-                  <td>{aluno.codAluno}</td>
-                  <td>{aluno.nome}</td>
-                  <td>{aluno.cpf}</td>
-                  <td>{aluno.email}</td>
-                  <td>{String(aluno.data_nascimento).slice(0, 10)}</td>
-                  <td>{aluno.telefone}</td>
-                  <td>{aluno.ra}</td>
-                  <td>{aluno.cidade}</td>
-                  <td className="acoes-tabela">
-                    <button
-                      type="button"
-                      className="botao botao-editar"
-                      onClick={() => prepararEdicao(aluno)}
-                    >
-                      Alterar
-                    </button>
-
-                    <button
-                      type="button"
-                      className="botao botao-excluir"
-                      onClick={() => removerAluno(aluno.codAluno)}
-                    >
-                      Excluir
-                    </button>
-                  </td>
-                </tr>
-              ))}
-
-              {alunosFiltrados.length === 0 && (
-                <tr>
-                  <td colSpan="9">
-                    {alunos.length === 0
-                      ? "Nenhum aluno cadastrado."
-                      : "Nenhum aluno encontrado para esse filtro."}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      <section className="cartao">
+        <div className="cartao-topo">
+          <div>
+            <h2>Alunos cadastrados</h2>
+            <p className="cartao-descricao">
+              {carregando
+                ? "Carregando registros..."
+                : `Exibindo ${alunosFiltrados.length} de ${alunos.length} registro(s).`}
+            </p>
+          </div>
         </div>
-      )}
-    </main>
+
+        <div className="filtros">
+          <label className="campo-filtro">
+            <span>Filtrar por</span>
+            <select
+              value={campoFiltro}
+              onChange={(evento) => setCampoFiltro(evento.target.value)}
+            >
+              <option value="codAluno">Código</option>
+              <option value="nome">Nome</option>
+              <option value="cpf">CPF</option>
+              <option value="email">E-mail</option>
+              <option value="data_nascimento">Data de nascimento</option>
+              <option value="telefone">Telefone</option>
+              <option value="ra">RA</option>
+              <option value="cidade">Cidade</option>
+            </select>
+          </label>
+
+          <label className="campo-filtro campo-busca">
+            <span>Texto para buscar</span>
+            <input
+              type="text"
+              value={textoFiltro}
+              onChange={(evento) => setTextoFiltro(evento.target.value)}
+              placeholder="Digite o que deseja encontrar"
+            />
+          </label>
+
+          <button
+            type="button"
+            className="botao botao-secundario"
+            onClick={() => setTextoFiltro((texto) => texto.trim())}
+          >
+            Filtrar
+          </button>
+
+          <button
+            type="button"
+            className="botao botao-fantasma"
+            onClick={() => {
+              setCampoFiltro("nome");
+              setTextoFiltro("");
+            }}
+          >
+            Limpar
+          </button>
+        </div>
+
+        {carregando ? (
+          <div className="estado-carregando">
+            <span className="spinner" aria-hidden="true" />
+            Carregando alunos...
+          </div>
+        ) : (
+          <div className="tabela-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>E-mail</th>
+                  <th>Data de nascimento</th>
+                  <th>Telefone</th>
+                  <th>RA</th>
+                  <th>Cidade</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {alunosFiltrados.map((aluno) => (
+                  <tr key={aluno.codAluno}>
+                    <td>{aluno.codAluno}</td>
+                    <td>{aluno.nome}</td>
+                    <td>{aluno.cpf}</td>
+                    <td>{aluno.email}</td>
+                    <td>{String(aluno.data_nascimento).slice(0, 10)}</td>
+                    <td>{aluno.telefone}</td>
+                    <td>{aluno.ra}</td>
+                    <td>{aluno.cidade}</td>
+                    <td>
+                      <div className="acoes-tabela">
+                        <button
+                          type="button"
+                          className="botao-acao botao-acao-editar"
+                          onClick={() => prepararEdicao(aluno)}
+                        >
+                          Alterar
+                        </button>
+
+                        <button
+                          type="button"
+                          className="botao-acao botao-acao-excluir"
+                          onClick={() => removerAluno(aluno.codAluno)}
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                {alunosFiltrados.length === 0 && (
+                  <tr>
+                    <td className="tabela-vazia" colSpan="9">
+                      {alunos.length === 0
+                        ? "Nenhum aluno cadastrado."
+                        : "Nenhum aluno encontrado para esse filtro."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </section>
   );
 }
 

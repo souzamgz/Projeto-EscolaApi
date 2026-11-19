@@ -4,7 +4,6 @@ const mensagem = document.getElementById("mensagem");
 const parametros = new URLSearchParams(window.location.search);
 const codProf = parametros.get("codProf");
 
-
 if (formulario) {
     formulario.addEventListener("submit", async function (evento) {
 
@@ -176,11 +175,6 @@ async function carregarProfessores() {
     }
 }
 
-
-// ======================================================
-// EXIBIR PROFESSORES NA TABELA
-// ======================================================
-
 function exibirProfessores(listaProfessores) {
 
     const tabela = document.getElementById("listaProfessores");
@@ -228,11 +222,6 @@ function exibirProfessores(listaProfessores) {
     });
 }
 
-
-// ======================================================
-// FILTRO DE PROFESSORES
-// ======================================================
-
 function filtrarProfessores() {
 
     const campoElemento = document.getElementById("campoFiltro");
@@ -264,11 +253,6 @@ function filtrarProfessores() {
     exibirProfessores(professoresFiltrados);
 }
 
-
-// ======================================================
-// EVENTOS DO FILTRO
-// ======================================================
-
 const textoFiltro = document.getElementById("textoFiltro");
 
 if (textoFiltro) {
@@ -277,7 +261,6 @@ if (textoFiltro) {
 
 }
 
-
 const campoFiltro = document.getElementById("campoFiltro");
 
 if (campoFiltro) {
@@ -285,7 +268,6 @@ if (campoFiltro) {
     campoFiltro.addEventListener("change", filtrarProfessores);
 
 }
-
 
 const btnLimparFiltro = document.getElementById("btnLimparFiltro");
 
@@ -300,11 +282,6 @@ if (btnLimparFiltro) {
     });
 
 }
-
-
-// ======================================================
-// EXECUTA A LISTAGEM
-// ======================================================
 
 carregarProfessores();
 carregarProfessorParaAlteracao();
@@ -380,9 +357,6 @@ async function carregarProfessorParaAlteracao() {
     }
 }
 
-// ======================================================
-// CHAMA A FUNÇÃO DE EXLUIR DADOS
-// ======================================================
 async function excluirProfessor(codProf, nomeProf) {
 
     const confirmar = confirm(

@@ -1,13 +1,7 @@
 const API_URL = "http://127.0.0.1:8000";
 
 async function lerResposta(resposta, mensagemPadrao) {
-  let dados = null;
-
-  try {
-    dados = await resposta.json();
-  } catch {
-    dados = null;
-  }
+  const dados = await resposta.json().catch(() => null);
 
   if (!resposta.ok) {
     throw new Error(
@@ -16,6 +10,26 @@ async function lerResposta(resposta, mensagemPadrao) {
   }
 
   return dados;
+}
+
+async function excluir(recurso, id, mensagemPadrao) {
+  const resposta = await fetch(`${API_URL}/${recurso}/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!resposta.ok) {
+    const dados = await resposta.json().catch(() => null);
+
+    throw new Error(
+      dados && typeof dados.detail === "string" ? dados.detail : mensagemPadrao
+    );
+  }
+
+  if (resposta.status === 204) {
+    return null;
+  }
+
+  return resposta.json();
 }
 
 export async function listarAlunos() {
@@ -56,31 +70,7 @@ export async function alterarAluno(codAluno, aluno) {
 }
 
 export async function excluirAluno(codAluno) {
-  const resposta = await fetch(`${API_URL}/alunos/${codAluno}`, {
-    method: "DELETE",
-  });
-
-  if (!resposta.ok) {
-    let mensagem = "Não foi possível excluir o aluno.";
-
-    try {
-      const dados = await resposta.json();
-
-      if (typeof dados.detail === "string") {
-        mensagem = dados.detail;
-      }
-    } catch {
-      // A API pode responder sem um corpo JSON.
-    }
-
-    throw new Error(mensagem);
-  }
-
-  if (resposta.status === 204) {
-    return;
-  }
-
-  return resposta.json();
+  return excluir("alunos", codAluno, "Não foi possível excluir o aluno.");
 }
 
 export async function listarRecurso(recurso) {
@@ -121,29 +111,5 @@ export async function alterarRecurso(recurso, id, dados) {
 }
 
 export async function excluirRecurso(recurso, id) {
-  const resposta = await fetch(`${API_URL}/${recurso}/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!resposta.ok) {
-    let mensagem = "Não foi possível excluir o registro.";
-
-    try {
-      const dados = await resposta.json();
-
-      if (typeof dados.detail === "string") {
-        mensagem = dados.detail;
-      }
-    } catch {
-      // A API pode responder sem um corpo JSON.
-    }
-
-    throw new Error(mensagem);
-  }
-
-  if (resposta.status === 204) {
-    return;
-  }
-
-  return resposta.json();
+  return excluir(recurso, id, "Não foi possível excluir o registro.");
 }

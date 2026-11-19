@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
 import {
   listarRecurso,
   cadastrarRecurso,
@@ -97,10 +98,10 @@ function PessoaPage({ recurso, titulo, singular, rotulo, idField }) {
     try {
       if (registroEditando !== null) {
         await alterarRecurso(recurso, registroEditando, formulario);
-        setMensagem(`${rotulo} alterado com sucesso!`);
+        setMensagem(`${rotulo} alterado com sucesso.`);
       } else {
         await cadastrarRecurso(recurso, formulario);
-        setMensagem(`${rotulo} cadastrado com sucesso!`);
+        setMensagem(`${rotulo} cadastrado com sucesso.`);
       }
 
       setFormulario(formularioVazio);
@@ -128,7 +129,7 @@ function PessoaPage({ recurso, titulo, singular, rotulo, idField }) {
 
     try {
       await excluirRecurso(recurso, id);
-      setMensagem(`${rotulo} excluído com sucesso!`);
+      setMensagem(`${rotulo} excluído com sucesso.`);
       await carregarRegistros();
     } catch (erro) {
       setErro(erro.message || `Não foi possível excluir o registro de ${singular}.`);
@@ -148,42 +149,64 @@ function PessoaPage({ recurso, titulo, singular, rotulo, idField }) {
   });
 
   return (
-    <main className="pagina">
-      <div className="topo-pagina">
-        <div>
-          <h1>{titulo}</h1>
-          <p>
-            Consulte os registros de {titulo.toLowerCase()} ou realize um novo
-            cadastro.
-          </p>
-        </div>
+    <section className="pagina">
+      <PageHeader
+        titulo={titulo}
+        descricao={`Consulte, cadastre, altere e exclua os registros de ${titulo.toLowerCase()}.`}
+        acao={
+          !mostrarFormulario ? (
+            <button
+              className="botao botao-principal"
+              type="button"
+              onClick={abrirFormulario}
+            >
+              Novo {singular}
+            </button>
+          ) : null
+        }
+      />
 
-        <Link className="botao botao-secundario" to="/">
-          Voltar ao início
-        </Link>
-      </div>
-
-      {!mostrarFormulario && (
-        <button className="botao botao-principal" onClick={abrirFormulario}>
-          Cadastrar {singular}
-        </button>
+      {mensagem && (
+        <p className="alerta alerta-sucesso" role="status">
+          {mensagem}
+        </p>
       )}
 
-      {mensagem && <p className="mensagem-sucesso">{mensagem}</p>}
-      {erro && <p className="mensagem-erro">{erro}</p>}
+      {erro && (
+        <p className="alerta alerta-erro" role="alert">
+          {erro}
+        </p>
+      )}
 
       {mostrarFormulario && (
-        <section className="formulario">
-          <h2>
-            {registroEditando !== null
-              ? `Alterar ${singular}`
-              : `Novo ${singular}`}
-          </h2>
+        <section className="cartao formulario">
+          <div className="cartao-topo">
+            <div>
+              <h2>
+                {registroEditando !== null
+                  ? `Alterar ${singular}`
+                  : `Novo ${singular}`}
+              </h2>
+              <p className="cartao-descricao">
+                {registroEditando !== null
+                  ? `Atualize os dados do ${singular} selecionado.`
+                  : `Preencha os dados para cadastrar um novo ${singular}.`}
+              </p>
+            </div>
+
+            <button
+              className="botao botao-fantasma botao-pequeno"
+              type="button"
+              onClick={fecharFormulario}
+            >
+              Fechar
+            </button>
+          </div>
 
           <form onSubmit={salvarRegistro}>
             <div className="campos">
               <label>
-                Nome
+                <span>Nome</span>
                 <input
                   name="nome"
                   value={formulario.nome}
@@ -194,7 +217,7 @@ function PessoaPage({ recurso, titulo, singular, rotulo, idField }) {
               </label>
 
               <label>
-                CPF
+                <span>CPF</span>
                 <input
                   name="cpf"
                   value={formulario.cpf}
@@ -205,7 +228,7 @@ function PessoaPage({ recurso, titulo, singular, rotulo, idField }) {
               </label>
 
               <label>
-                E-mail
+                <span>E-mail</span>
                 <input
                   name="email"
                   type="email"
@@ -217,7 +240,7 @@ function PessoaPage({ recurso, titulo, singular, rotulo, idField }) {
               </label>
 
               <label>
-                Data de nascimento
+                <span>Data de nascimento</span>
                 <input
                   name="data_nascimento"
                   type="date"
@@ -228,7 +251,7 @@ function PessoaPage({ recurso, titulo, singular, rotulo, idField }) {
               </label>
 
               <label>
-                Telefone
+                <span>Telefone</span>
                 <input
                   name="telefone"
                   value={formulario.telefone}
@@ -239,7 +262,7 @@ function PessoaPage({ recurso, titulo, singular, rotulo, idField }) {
               </label>
 
               <label>
-                Cidade
+                <span>Cidade</span>
                 <input
                   name="cidade"
                   value={formulario.cidade}
@@ -264,7 +287,7 @@ function PessoaPage({ recurso, titulo, singular, rotulo, idField }) {
               </button>
 
               <button
-                className="botao botao-cancelar"
+                className="botao botao-secundario"
                 type="button"
                 onClick={fecharFormulario}
               >
@@ -275,117 +298,133 @@ function PessoaPage({ recurso, titulo, singular, rotulo, idField }) {
         </section>
       )}
 
-      <section className="filtros">
-        <label>
-          Filtrar por
-          <select
-            value={campoFiltro}
-            onChange={(evento) => setCampoFiltro(evento.target.value)}
-          >
-            <option value={idField}>Código</option>
-            <option value="nome">Nome</option>
-            <option value="cpf">CPF</option>
-            <option value="email">E-mail</option>
-            <option value="data_nascimento">Data de nascimento</option>
-            <option value="telefone">Telefone</option>
-            <option value="cidade">Cidade</option>
-          </select>
-        </label>
-
-        <label>
-          Texto para buscar
-          <input
-            type="text"
-            value={textoFiltro}
-            onChange={(evento) => setTextoFiltro(evento.target.value)}
-            placeholder="Digite o que deseja encontrar"
-          />
-        </label>
-
-        <button
-          type="button"
-          className="botao botao-principal"
-          onClick={() => setTextoFiltro((texto) => texto.trim())}
-        >
-          Filtrar
-        </button>
-
-        <button
-          type="button"
-          className="botao botao-secundario"
-          onClick={() => {
-            setCampoFiltro("nome");
-            setTextoFiltro("");
-          }}
-        >
-          Limpar
-        </button>
-      </section>
-
-      <h2>{titulo} cadastrados</h2>
-
-      {carregando ? (
-        <p>Carregando registros...</p>
-      ) : (
-        <div className="tabela-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Nome</th>
-                <th>CPF</th>
-                <th>E-mail</th>
-                <th>Data de nascimento</th>
-                <th>Telefone</th>
-                <th>Cidade</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {registrosFiltrados.map((registro) => (
-                <tr key={registro[idField]}>
-                  <td>{registro[idField]}</td>
-                  <td>{registro.nome}</td>
-                  <td>{registro.cpf}</td>
-                  <td>{registro.email}</td>
-                  <td>{String(registro.data_nascimento).slice(0, 10)}</td>
-                  <td>{registro.telefone}</td>
-                  <td>{registro.cidade}</td>
-                  <td className="acoes-tabela">
-                    <button
-                      type="button"
-                      className="botao botao-editar"
-                      onClick={() => prepararEdicao(registro)}
-                    >
-                      Alterar
-                    </button>
-
-                    <button
-                      type="button"
-                      className="botao botao-excluir"
-                      onClick={() => removerRegistro(registro[idField])}
-                    >
-                      Excluir
-                    </button>
-                  </td>
-                </tr>
-              ))}
-
-              {registrosFiltrados.length === 0 && (
-                <tr>
-                  <td colSpan="8">
-                    {registros.length === 0
-                      ? `Nenhum registro de ${singular} cadastrado.`
-                      : "Nenhum registro encontrado para esse filtro."}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      <section className="cartao">
+        <div className="cartao-topo">
+          <div>
+            <h2>{titulo} cadastrados</h2>
+            <p className="cartao-descricao">
+              {carregando
+                ? "Carregando registros..."
+                : `Exibindo ${registrosFiltrados.length} de ${registros.length} registro(s).`}
+            </p>
+          </div>
         </div>
-      )}
-    </main>
+
+        <div className="filtros">
+          <label className="campo-filtro">
+            <span>Filtrar por</span>
+            <select
+              value={campoFiltro}
+              onChange={(evento) => setCampoFiltro(evento.target.value)}
+            >
+              <option value={idField}>Código</option>
+              <option value="nome">Nome</option>
+              <option value="cpf">CPF</option>
+              <option value="email">E-mail</option>
+              <option value="data_nascimento">Data de nascimento</option>
+              <option value="telefone">Telefone</option>
+              <option value="cidade">Cidade</option>
+            </select>
+          </label>
+
+          <label className="campo-filtro campo-busca">
+            <span>Texto para buscar</span>
+            <input
+              type="text"
+              value={textoFiltro}
+              onChange={(evento) => setTextoFiltro(evento.target.value)}
+              placeholder="Digite o que deseja encontrar"
+            />
+          </label>
+
+          <button
+            type="button"
+            className="botao botao-secundario"
+            onClick={() => setTextoFiltro((texto) => texto.trim())}
+          >
+            Filtrar
+          </button>
+
+          <button
+            type="button"
+            className="botao botao-fantasma"
+            onClick={() => {
+              setCampoFiltro("nome");
+              setTextoFiltro("");
+            }}
+          >
+            Limpar
+          </button>
+        </div>
+
+        {carregando ? (
+          <div className="estado-carregando">
+            <span className="spinner" aria-hidden="true" />
+            Carregando registros...
+          </div>
+        ) : (
+          <div className="tabela-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>E-mail</th>
+                  <th>Data de nascimento</th>
+                  <th>Telefone</th>
+                  <th>Cidade</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {registrosFiltrados.map((registro) => (
+                  <tr key={registro[idField]}>
+                    <td>{registro[idField]}</td>
+                    <td>{registro.nome}</td>
+                    <td>{registro.cpf}</td>
+                    <td>{registro.email}</td>
+                    <td>{String(registro.data_nascimento).slice(0, 10)}</td>
+                    <td>{registro.telefone}</td>
+                    <td>{registro.cidade}</td>
+                    <td>
+                      <div className="acoes-tabela">
+                        <button
+                          type="button"
+                          className="botao-acao botao-acao-editar"
+                          onClick={() => prepararEdicao(registro)}
+                        >
+                          Alterar
+                        </button>
+
+                        <button
+                          type="button"
+                          className="botao-acao botao-acao-excluir"
+                          onClick={() => removerRegistro(registro[idField])}
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                {registrosFiltrados.length === 0 && (
+                  <tr>
+                    <td className="tabela-vazia" colSpan="8">
+                      {registros.length === 0
+                        ? `Nenhum registro de ${singular} cadastrado.`
+                        : "Nenhum registro encontrado para esse filtro."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </section>
   );
 }
 

@@ -4,7 +4,6 @@ const mensagem = document.getElementById("mensagem");
 const parametros = new URLSearchParams(window.location.search);
 const codFunc = parametros.get("codFunc");
 
-
 if (formulario) {
     formulario.addEventListener(
         "submit",
@@ -169,11 +168,6 @@ async function carregarFuncionarios() {
     }
 }
 
-
-// ======================================================
-// EXIBIR FUNCIONARIOS NA TABELA
-// ======================================================
-
 function exibirFuncionarios(listaFuncionarios) {
 
     const tabela = document.getElementById("listaFuncionarios");
@@ -221,11 +215,6 @@ function exibirFuncionarios(listaFuncionarios) {
     });
 }
 
-
-// ======================================================
-// FILTRO DE FUNCIONARIOS
-// ======================================================
-
 function filtrarFuncionarios() {
 
     const campoElemento = document.getElementById("campoFiltro");
@@ -257,11 +246,6 @@ function filtrarFuncionarios() {
     exibirFuncionarios(funcionariosFiltrados);
 }
 
-
-// ======================================================
-// EVENTOS DO FILTRO
-// ======================================================
-
 const textoFiltro = document.getElementById("textoFiltro");
 
 if (textoFiltro) {
@@ -270,7 +254,6 @@ if (textoFiltro) {
 
 }
 
-
 const campoFiltro = document.getElementById("campoFiltro");
 
 if (campoFiltro) {
@@ -278,7 +261,6 @@ if (campoFiltro) {
     campoFiltro.addEventListener("change", filtrarFuncionarios);
 
 }
-
 
 const btnLimparFiltro = document.getElementById("btnLimparFiltro");
 
@@ -293,11 +275,6 @@ if (btnLimparFiltro) {
     });
 
 }
-
-
-// ======================================================
-// EXECUTA A LISTAGEM
-// ======================================================
 
 carregarFuncionarios();
 carregarFuncionarioParaAlteracao();
@@ -369,9 +346,6 @@ async function carregarFuncionarioParaAlteracao() {
     }
 }
 
-// ======================================================
-// CHAMA A FUNÇÃO DE EXLUIR DADOS
-// ======================================================
 async function excluirFuncionario(codFunc, nomeFunc) {
 
     const confirmar = confirm(
